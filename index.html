@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Nano Faucet</title>
+    <style>
+        /* Your custom CSS styles here */
+    </style>
+</head>
+<body>
+    <h1>Nano Faucet</h1>
+
+    <h2>Account Information</h2>
+    <div id="accountInfo">
+        Loading account information...
+    </div>
+
+    <h2>Transaction History</h2>
+    <ul id="transactionList">
+        Loading transaction history...
+    </ul>
+
+    <h2>QR Code</h2>
+    <div id="qrcode">
+        Loading QR code...
+    </div>
+
+    <h2>Node Status</h2>
+    <div id="nodeStatus">
+        Loading node status...
+    </div>
+
+    <script>
+        // Fetch account information
+        fetch('/api/info')
+            .then(response => response.json())
+            .then(data => {
+                const accountInfoDiv = document.getElementById('accountInfo');
+                accountInfoDiv.innerHTML = `
+                    <p>Account: ${data.account}</p>
+                    <p>Balance: ${data.balance}</p>
+                    <p>Received: ${data.received}</p>
+                    <p>Sent: ${data.sent}</p>
+                    <p>Pending: ${data.pending}</p>
+                    <p>Drops: ${data.drops}</p>
+                    <p>Representative: ${data.representative}</p>
+                `;
+            })
+            .catch(error => {
+                console.error('Error fetching account information:', error);
+            });
+
+        // Fetch transaction history
+        fetch('/api/history')
+            .then(response => response.json())
+            .then(data => {
+                const transactionList = document.getElementById('transactionList');
+                transactionList.innerHTML = '';
+                data.forEach(transaction => {
+                    const listItem = document.createElement('li');
+                    listItem.textContent = `Timestamp: ${transaction.timestamp}, Subtype: ${transaction.subtype}`;
+                    transactionList.appendChild(listItem);
+                });
+            })
+            .catch(error => {
+                console.error('Error fetching transaction history:', error);
+            });
+
+        // Fetch QR code
+        fetch('/api/qrcode')
+            .then(response => response.blob())
+            .then(blob => {
+                const qrcodeDiv = document.getElementById('qrcode');
+                qrcodeDiv.innerHTML = '';
+                const qrcodeImage = document.createElement('img');
+                qrcodeImage.src = URL.createObjectURL(blob);
+                qrcodeDiv.appendChild(qrcodeImage);
+            })
+            .catch(error => {
+                console.error('Error fetching QR code:', error);
+            });
+
+        // Fetch node status
+        fetch('/api/node')
+            .then(response => response.json())
+            .then(data => {
+                const nodeStatusDiv = document.getElementById('nodeStatus');
+                nodeStatusDiv.textContent = `Telemetry: ${data.telemetry}`;
+            })
+            .catch(error => {
+                console.error('Error fetching node status:', error);
+            });
+    </script>
+</body>
+</html>
